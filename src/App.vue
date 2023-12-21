@@ -5,30 +5,32 @@
         <div class="radius">
           <DeviceLabel />
         </div>
+        <el-button type="primary" @click="submit">Primary</el-button>
       </el-header>
       <el-container>
         <el-main class="graph">
           <el-scrollbar height="650px">
             <el-row :gutter="gutter">
               <el-col :span="span">
-                <Graph :dataF="data1" graphId="a" />,
+                <Graph :dataY="data1" :dataX="dataX" graphId="a" />,
               </el-col>
               <el-col :span="span">
-                <Graph :dataF="data2" graphId="b" />,
+                <Graph :dataY="data2" :dataX="dataX" graphId="b" />,
               </el-col>
             </el-row>
             <el-row :gutter="gutter">
               <el-col :span="span">
-                <Graph :dataF="data3" graphId="c" />,
+                <Graph :dataY="data3" :dataX="dataX" graphId="c" />,
               </el-col>
               <el-col :span="span">
-                <Graph :dataF="data4" graphId="d" />,
+                <Graph :dataY="data4" :dataX="dataX" graphId="d" />,
               </el-col>
             </el-row>
           </el-scrollbar>
         </el-main>
-        <el-aside class="inquery" width="400px">
-          <Test />
+        <el-aside class="inquery" width="500px">
+          <Inquery />
+          <Inquery />
         </el-aside>
       </el-container>
     </el-container>
@@ -36,48 +38,55 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, reactive } from "vue";
+import { ElMessage } from "element-plus";
+
 import DeviceLabel from "./components/DeviceLabel.vue";
-import Test from "./components/Test.vue";
+import Inquery from "./components/Inquery.vue";
 import Graph from "./components/Graph.vue";
+import Test from "./components/Test.vue";
 
-const data1 = [5, 20, 56, 10, 10, 20];
+import { sendGetRealStatus } from "./api/data.js";
 
-const data2 = [5, 30, 16, 10, 70, 10];
+const data1 = reactive([]);
 
-const data3 = [5, 25, 46, 10, 40, 20];
+const data2 = ref([5, 30, 16, 10, 70, 10]);
 
-const data4 = [75, 25, 46, 40, 40, 20];
+const data3 = ref([5, 25, 46, 10, 40, 20]);
+
+const data4 = ref([75, 25, 46, 40, 40, 20]);
+
+const dataX = reactive([]);
 
 const span = ref(12);
 const gutter = ref(15);
 
-const radiusGroup = ref([
-  {
-    name: "No Radius",
-    type: "",
-  },
-  {
-    name: "Small Radius",
-    type: "small",
-  },
-  {
-    name: "Large Radius",
-    type: "base",
-  },
-  {
-    name: "Round Radius",
-    type: "round",
-  },
-]);
-
-const getValue = (type) => {
-  const getCssVarValue = (prefix, type) =>
-    getComputedStyle(document.documentElement).getPropertyValue(
-      `--el-${prefix}-${type}`
-    );
-  return getCssVarValue("border-radius", type);
-};
+function submit() {
+  console.log("11111");
+  sendGetRealStatus()
+    .then((res) => {
+      ElMessage({
+        message: res.message,
+        type: "success",
+      });
+      res = res.data.disaggregation;
+      res = res[0];
+      let i = 0;
+      res.forEach((element) => {
+        data1.push(element);
+        dataX.push(i);
+        i++;
+      });
+      console.log(data1);
+      console.log(dataX);
+    })
+    .catch((err) => {
+      ElMessage({
+        message: err.message,
+        type: "error",
+      });
+    });
+}
 </script>
 
 <style>

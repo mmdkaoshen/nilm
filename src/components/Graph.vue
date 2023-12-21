@@ -8,9 +8,13 @@ import * as echarts from "echarts";
 import { onMounted } from "vue";
 
 const aa = defineProps({
-  dataF: {
+  dataY: {
     type: Array,
-    default: [5, 20, 56, 10, 10, 20],
+    default: [],
+  },
+  dataX: {
+    type: Array,
+    default: [],
   },
   graphId: {
     type: String,
@@ -29,6 +33,7 @@ function init() {
     // 如果不存在，就进行初始化。
     myChart = echarts.init(document.getElementById(aa.graphId));
   }
+
   // 绘制图表
   let options = {
     title: {
@@ -36,14 +41,14 @@ function init() {
     },
     tooltip: {},
     xAxis: {
-      data: ["衬衫", "羊毛衫", "雪纺衫", "裤子", "高跟鞋", "袜子"],
+      data: aa.dataX,
     },
     yAxis: {},
     series: [
       {
         name: "销量",
         type: "line",
-        data: aa.dataF,
+        data: aa.dataY,
       },
     ],
   };
